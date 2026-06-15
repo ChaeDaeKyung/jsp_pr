@@ -1,0 +1,54 @@
+JSP (Java Server Page)
+    - 동적인 HTML을 생성하기 위해서.
+    - Servlet 단점을 개선.
+        - class안에 HTML코드가 작성되는 구성이다.
+        - 디자인에 관련된 코드를 만들기가 매우 어렵다.
+        - 디자이너와 개발자간의 업무구분이 되지 않는다.
+        - 서비스를 할려면DD(Deployment Descriptor)가 필요하다.
+    - 확장자가 .jsp인 파일을 생성하므로 compile(WAS : 예 : tomcat)을 하지 않는다.
+    - WAS가 jsp에 대한 요청이 발생시 compile을 수행해준다.
+    - 웹 디자이너와 웹 개발자간의 업무 구분이 어느정도 가능해진다.
+    - CSS (Client Side Script) : front-end에서 실행
+        : javaScript, actionScript => HTML파일에서 작성되고, client에서 해석되고 실행되는 언어
+    - JSP = SSS (Server Side Script) : back-end에서 실행
+        : JSP, ASP, PHP => 요청되면 서버에서 해석 및 실행 된 후 동적으로 HTML을 생성하여 응답하는 언어
+    - servlet보다 속도가 느리다.
+    - DD(web.xml) 설정없이 동작한다.
+    - Java SE에서 제공한느 모든 기능을 사용할 수 있다.
+
+JSP 파일 구조
+    <%@ page 속성="값" 속성="값" ... %>... : 선언부 -지시자를 선언 : page directive 선언
+    <html>...</html> : 1. 디자이너(코더)가 HTML코드 작성
+                       2. 개발자가 JSP 코드 작성 (JSP Tags, 내장객체, action tags, EL, JSTL)
+
+JSP Tags
+    - JSP에서 기능을 정의할 때 사용하는 태그들.
+    - 5가지의 태그가 제공.
+    - JSP가 Java로 변경될 때 Servlet으로 생성되고, 사용자에게 JSP tag의 내용이 보여지지 않는다.
+<% 코드... %>
+    지시자 (directive) <%@ page...%>    - page : JSP페이지에 환경설정용.
+                      <%@ include...%> - include : 다른JSP를 끼워넣어 보여줄 때.(소스코등의 병합) 중복코드를 줄일 수 있다.
+    선언 (declaration) <%! %>          - JSP에서 method를 저의할 때 사용.
+                                       - JSP에서 instance varible을 선언할 때.
+    스크립틀렛 (sciptlet) <%  %>        - JSP에서 method내 자바코드를 정의 할때 사용.
+                                        (지역변수 선언, 연산, 제어 객체생성, method 호출)
+    표현식 (expression) <%=  %>         - JSP에서 발생한 값을 web browser로 출력할 때 사용.
+    주석 (comment) <%--  --%>           - JSP 태그가 servlet 코드를 생성되는 것을 막을때 사용.
+
+sciptlet
+    - JSP에서 method내에 자바코드를 정의할 때.
+    - 스크립틀렛 안에서 정의한 코드는 JSP가 자바 소스코드로 변경 될때 _jspService() method 내에 코드가 생성된다.
+    - 내장 객체를 사용 가능하다.
+    - HTML 태그들은 java에서 out.write() 매소드로 써준다.
+    - 표현식으로 작성된 변수를 사용시에는 out.print() 메소드로 사용된다.
+    사용) 
+        <% 내용 %>
+        예시)
+        <% if(%> html에서 조건에 넣을 값을 사용 후 <%) {%>
+
+        <% } %>
+
+
+
+
+
