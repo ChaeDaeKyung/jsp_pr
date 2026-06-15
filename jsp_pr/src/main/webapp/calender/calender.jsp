@@ -146,7 +146,7 @@
 							for(int tempDay=1; ;tempDay++){
 								//증가하는 임시일자를 달력객체에 설정
 								//현재월에 없는 날짜가 입력되면 자동으로 다음달로 1일로 된다.(6월 기중 31일이 입력되면 7월 1일)
-								cal.set(Calendar.DAY_OF_WEEK_IN_MONTH,tempDay);
+								cal.set(Calendar.DAY_OF_MONTH,tempDay);
 								if(cal.get(Calendar.DAY_OF_MONTH) != tempDay){
 									int lastDayOfWeek=cal.get(Calendar.DAY_OF_MONTH);
 									//for(int blankTd=1; blankTd < lastDayOfWeek; blankTd++){

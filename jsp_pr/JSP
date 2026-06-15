@@ -35,7 +35,7 @@ JSP Tags
     표현식 (expression) <%=  %>         - JSP에서 발생한 값을 web browser로 출력할 때 사용.
     주석 (comment) <%--  --%>           - JSP 태그가 servlet 코드를 생성되는 것을 막을때 사용.
 
-sciptlet
+sciptlet (스크립틀렛)
     - JSP에서 method내에 자바코드를 정의할 때.
     - 스크립틀렛 안에서 정의한 코드는 JSP가 자바 소스코드로 변경 될때 _jspService() method 내에 코드가 생성된다.
     - 내장 객체를 사용 가능하다.
@@ -48,7 +48,8 @@ sciptlet
 
         <% } %>
 
-
+declaration (선언)
+	- JSP에서 선언 하기위해서 쓴다.
 
 
 
