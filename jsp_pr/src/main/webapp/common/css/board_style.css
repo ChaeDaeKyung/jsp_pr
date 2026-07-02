@@ -1,10 +1,17 @@
 @charset "UTF-8";
 
-body, td, th, div, p, li, input, a {
+body,
+td,
+th,
+div,
+p,
+li,
+input,
+a {
 	font-size: 16px;
 	font-weight: normal;
-	color: #333333;
-	font-family: '맑은 고딕', 굴림, Sans-Serif;
+	color: #333;
+	font-family: "맑은 고딕", "굴림", "Sans-Serif";
 }
 
 a {
@@ -14,21 +21,24 @@ a {
 a:hover {
 	text-decoration: underline;
 }
+
 /* 게시판 테이블 디자인 */
 .boardTab {
 	border: 0px;
-	border-top: 3px solid #6F6DD9;
-	border-bottom: 2px solid #6F6DD9;
-	border-spacing: 0px;
+	border-top: 3px solid #29367c;
+	border-bottom: 2px solid #29367c;
+	border-spacing: 0;
 }
+
 /* 게시판 테이블 제목 디자인 */
 .boardTab>thead>tr>th {
 	height: 38px;
-	background-color: #FFFFFF;
+	background-color: #FFF;
 	border: 0px;
-	border-bottom: 2px solid #6F6DD9;
+	border-bottom: 2px solid #29367c;
 	font-weight: bold;
 }
+
 /* 게시판 테이블 각 항목 넓이 디자인 */
 .numTitle {
 	width: 55px;
@@ -38,26 +48,28 @@ a:hover {
 	width: 510px;
 }
 
-.writeTtitle {
+.writeTitle {
 	width: 125px;
 }
 
-.inputTitle {
+.inputDateTitle {
 	width: 60px;
 }
 
-.cntTtitle {
+.cntTitle {
 	width: 60px;
 }
 
 .recommTitle {
 	width: 38px;
 }
+
 /* 행의 높이 */
 .boardTab>tbody>tr>td {
 	height: 38px;
-	border-bottom: 1px solid #EEEEEE;
+	border-bottom: 1px solid #eee;
 }
+
 /* 행에 마우스 포인터가 올라갔을 때 바닥색 설정 */
 .boardTab>tbody>tr:hover {
 	background-color: #EEEEEE;
@@ -73,10 +85,9 @@ a:hover {
 }
 
 .listBt {
-	font-size: 15px;
-	background-color: #6F6DD9;
+	background-color: #29367c;
 	border: 1px;
-	border-color: #4F4DC6;
+	border-color: #29367c;
 	color: #FFFFFF;
 	width: 83px;
 	height: 35px;

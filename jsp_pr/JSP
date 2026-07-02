@@ -195,7 +195,6 @@ POST방식으로 요청하여 입력값이 UTF-8이 아닌 다른 charset="8859_
  		=> encoding이 두번이 되게 되면 ???으로 문자열이 나온다. 이상황에서는 어디서 되는지 찿아서 한번만 encoding되게 해야한다.
 	2) request.setCharacterEncoding("변환할 charset");
 	
-	
 forword
 	- 요청처리 내장 객체(HttpServletRequest)를 사용한 페이지 이동.
 	- 웹 브라우저는 페이지의 이동을 모른다. (주소창의 주소가 변경되지 않는다.)
@@ -211,7 +210,6 @@ forword
 	3) 이동한 페이지에는 요청객체에 할당된 속성값을 받을 수 있따.
 		데이터형 객체명 = (데이터형)request.getAttribute("키값");
 
-
 response
 	- javax.sevlet.http.HttpServletReponse 가 데이터 형인 객체.
 	- redirect 방식의 페이지 이동, 무조건 다운로드
@@ -223,7 +221,7 @@ response
 		- 요청받은 페이지에서 문제가 생겻을때 다시 url을 요청하여 비정상 실행에 대한 페이지로 이동한다.
 		response.sendRedirect("이동할 URL");
 	
-	location.href로도 이동 가능.
+	location.href 로도 이동 가능.
 	<meta> - 지정한 시간에 페이지 이동.
 	
 	
@@ -234,14 +232,663 @@ out 내장 객체
 	out.print(값);
 	out.println(값);
 	
+관계유지
+	- 웹은 비연결성이다. (웹은 요청이 발생하면 응답을 해주고, 서버는 연결을 끊는다.)
+	
+	장점 : 접속자의 수가 많아도 연결을 유지하지 않기 때문에 저사양의 컴퓨터로도 서버를 구성이 가능하다.
+	
+	단점 : 접속자의 상태를 실시간으로 알 수 없다.
+		  서버의 최신 데이터를 접속자에게 실시간으로 제공할 수 없다.
+		  (server push 할 수 없다. 대신 client에서 요청을 다시 보낸다. client pull로 해결한다.) 
+	
+	- 서버에서 접속자의 상태를 알 수 있도록 기술 지원 (session, cookie)
 	
 	
+session
+	- 접속자의 정보를 서버측 메모리에 저장하는 기술. (로그인 유지.)
+	- 접속자가 사용하는 모든 값을 저장할 수 있다.(Object 으로 저장)
+	- 접속자가 어떤 웹 브라우저를 사용 하더라도 접속자의 정보를 저장할 수 있다.
+	- Servlet/JSP에서는 session을 사용하기 위해 HttpSession 인터페이스를 제공한다.
+	- 내장 객체로 제공이 된다. page directive에서 session="true"(기본설정)인 설정으로 사용할 수 있다.
+	
+session 필요한 이유
+	- WAS 에서 제공해준다.
+	session은 map 기반
+	키(브라우저 ID), 값(브라우저에서 저장한 값)
+	- WAS가 실행되면 하나의 session객체가 생성된다.
+	- 접속자를 식별하여 접속자의 값을 저장할 목적으로 session이 만들어진다.
+	
+	클라이언트가 최초 접속시(요청) key값이 있는지 확인 후 없으면 난수로 키를 만들어준다.
+	이후에 jsp가 응답이 된다.
+	그런 후 다른 jsp로 요청시 그 키값을 같이 숨겨서보내준다.
+
+HttpSession
+	- WAS에서 제공하는 session 객체를 저장하고 사용할 수 있는 interface.
+	- page directive에 session = true 이거나 생략한 상태에서만 사용한다.
+	1. 세션얻기(session=="false" 인 상태에서만 session을 얻어서 사용한다.) 권장하지는 않는다.
+		HttpSession session = request.getSession();
+	2. 세션 값 설정
+		session.setAttribute("이름",값); 값 = object - 여러페이지에서 자주 사용하게 될 값.
+													- 민감한 개인 정보는 저장하지 않는다.
+													- DB 조회된 많은 양의 데이터(List)는 저장하지 않는다.
+	3. 세션에서 값 얻기
+		 데이터형 변수명 = (데이터형) session.getAttribute("이름");
+	
+	4. 세션의 생존시간 설정 (tomcat은 기본 생존시간 30분) interval이라고 한다.
+		(세션은 하나만 생성되기 때문에 몯느 페이지에 적용된다.)
+		session.setMaxInactiveInterval(second); // 초*분*시
+		
+	5. 세션 값 삭제
+		session.removeAttribute(이름);
+		
+	6. 브라우저에서 할당된 세션을 무효화
+		session.invalidate();
 	
 	
+cookie
+	- 접속자의 정보를 접속자의 하드디스크에 파일로 저장하는 기술.
+	- 문자열만 저장 가능하다. (1MB 까지만 저장 가능하다.)
+	- 접속자가 차단하거나, 웹브라우저가 쿠키를 지원하지 않으면 사용할 수 없다.
+	- 접속자가 쿠키를 확인하고, 변조할 수 있다. - 중요한 정보는 저장하지 않는다.
+	- 비연결성인 웹에서 관계유지를 사용하기 위해서 사요오디는 클래스.
+	- 내장 객체가 아니다.(개발자가 직접 객체화하여 사용한다.)
+	- 접속자 HDD에 file로 생성되고  생성된 파일에는 문자열로만 정보가 저장이 된다.
+	- 최장 1년까지 유지된다.
+	- 웹 브라우저에서 확인, 수정, 삭제도 가능.
+	- session보다 더 중요하지 않은 값들을 정보들을 저장한다.(팝업창 오늘 하루 창 열지 않기)
+	
+	1. 객체화
+		Cookie cookie = new Cookie("이름", "값");
+	2. 생존시간 설정.
+		cookie.setMaxAge(ms); //초*분*시*일*월*년
+	3. 쿠키 심기.
+		// 쿠키의 생존 시간을 설정하지 않으면 브라우거가 종료될때 같이 삭제 된다.(sessionStorage)
+		reponse.addCookie(쿠키 객체);
+	4. 쿠키들 읽기
+		Cookie[] cookies = request.getCookies();
+		Cookie tempCookie = null;
+		for(int i=0; i < cookies.length; i++){
+			tempCookie = cookies[i];
+			tempCookie.getName();
+			tempCookie.getValue();
+		}// end for
+		
+	5. 쿠키 삭제 method는 없다.
+		1) 동일한 이름의 쿠키를 생성
+		Cookie cookie=new Cookie("이름","");
+		2) 생존시간 설정
+		cookie.setMaxAge(0);
+		3) 쿠키 심기
+		response.addCookie(쿠키객체);
 	
 	
+action tag(표준 엑션)
+	- 태그 자체가 정해진 일을 수행하는 태그.
+	- element사이에 값이 없다면 / 끊어서 짧게 사용할 수 있다.
+	사용법)
+		<jsp:태그명 속성="값" 속성="값" ...></jsp:태그명>
+		
+		jsp: => prefix : 태그명을 식별하기 위해서 사용.
+		태그명 => suffix : 기능.
+		
+<jsp:include> : 중복된 디자인을 사용하는 페이지에서 사용하여 사용한다.
+	- <%@ include %> 보다는 처리 속도가 느리다. 
+	- java source code가 따로 생성되고, 응답되는HTML 생선단계에서 합쳐져서 응답이 된다.
+	- 변수나 method의 공유가 되지 않는다.
+	- page directive에서 설정에 대한 충돌이 발생하지 않는다.
+	- 그러므로 디자인을 합치는 용도로 사용한다.
+	<jsp:include page="끼워 넣을 JSP의 URI"/>
+	
+	 
+<jsp:useBean>
+	- jsp:useBean으로 객체를 생성
+	- jsp:setProperty로 setter method를 호출
+	- jsp:getProperty로 getter method를 호출하여 웹 브라우저로 출력한다.
+	- scope 객체 : 값을 저장하고 사용하는 객체 
+		scope 속성 값 : pageContext > request > session > apllication
+		 				(page로 사용)
+		 	- page (pageContext) : jsp를 요청할 때 마다 객체가 생성되고, 생성된 객체는 해당 JSP에서만 사용.
+		 	- request : jsp를 요청할 때 마다 객체가 생성되고, 생성된 객체는 forward로 이동한 페이지에서 사용가능하다.
+		 	
+		 	======값이 유지 되거나 되지 않는 객체들 =======================================================================
+		 	
+		 	- session : 웹 브라우저 마다 객체가 생성(접속자마다 따로 사용.)되고, 생성된 객체는 모든 jsp에서 사용된다.
+		 	- application : 최초 접속자에 의해 하나의 객체가 생성된다. 모든 접속자는 하나의 객체를 사용하며 
+		 					이객체는 모든 페이지에서 사용가능하다.
+	사용법)
+		1. 객체화 default constructor를 사용하여 객체화
+		<sjp:useBean id="객체명" class="패키지명.클래스명" scope="객체화 후 객체의 사용범위"/>
+		
+		2.값 설정 : setter method 호출
+		<jsp:setProperty name="객체명" property="set을 제외한 method를 소문자" value="값"/>
+		
+		3.값 사용 :  getter method 호출 => 값을 호출과 동시에 웹 브라우저에 출력까지해준다.
+		<jsp:getProperty name="객체명" property="get을 제외한 method를 소문자"/>
+		- 기본 생성자가 없으면 에러가 발생한다.
+		
+		
+useBean 액션태그를 사용한 web parameter 받기
+	- request.getParameter() 나 request.getParameterValues()를 사용하지 않고, parameter를 받을 수 있다.
+	주의! : HTML Form Control의 name 속성의 값과 같은 이름으로 DTO의 setter method가 작성된 경우에만 받아진다.		
+	
+	1. DTO를 객체로 생성.
+		<jsp:useBean id="객체명" class="패키지명.클래스명" scope="page"/>
+	2. 모든 setter method 호출
+		<jsp:setProperty name="객체명" property="*"/> : name 속성과 form 이름이 같은 
+		
+		
+<jsp:forward> 액션태그
+	- forward 방식으로 페이지르 이동할때 사용.
+	 	: 데이터 처리페이지와 화면 디자인 페이지를 분리하여 작성할때.
+		
+	사용법
+		- web parameter 를 사용하지 않고 이동할 때.
+		<jsp:forward page="이동할 페이지의 URI"/>
+		
+		- web parameter를 동적으로 생성하여 이동할 때.
+		<jsp:forward page="이동할페이지의 URI">
+			<jsp:param name="파라미터명" value="값"/>
+			<jsp:param name="파라미터명" value="값"/>
+			<jsp:param name="파라미터명" value="값"/>
+		</jsp:forward>
+		
+		이동한 페이지에서 request.getParameter("이름")으로 사용.
+		
+		
+<jsp:setProperty>	
+<jsp:getProperty>
+<jsp:param>	
+
+EL (Expression Language)
+	- 표현 언어 : JSP에서 웹 브라우저의 출력을 목적으로 만들어진 언어.
+	- page directive 에서 isELIgnored="false"인 설정 상태에서만 사용할 수 있다.
+	- 변수 값, scope객체의 값, web parameter값, 간단한 연산 결과를 웹 브라우저로 출력.
+	- 변수의 값을 직접 출력 할 수 없고, scope 객체에 할당한 후 출력 할 수 있다.
+	- EL은 문자열만 존재한다.("문자열",'문자열')
+	- null은 출력하지 않는다.
+	사용법)
+		${ 코드 }
+		
+		연산자 사용)
+		${값 연사자 값} 연산자 - 단항연산자 : !(not), -
+							 - 산술 : +,-,*,/,% (mod)
+							 - 관계 : >(gt), < (lt), >=(ge), <=(le), ==(eq), !=(ne),
+							 - 논리 : &&(AND), ||(OR)
+							 - 삼항 : ? :
+							 - empty : 비어있는 값(null, "", list.size()==0)을 비교하여 true | false
+	
+EL에서 변수 출력 => 되지 않는다.
+	- EL에서는 변수를 직접 출력할 수 없다.
+	- scope 객체에 할당한 후 출력
+		
+		사용이 안됨 예)
+		<%
+		int i = 1;
+		%>
+		i=${ i }// 변수를 직접 접근이 되지 않는다.
+		
+		
+scope 객체들(pageContext, request, session, application)
+	=> 값 설정 (속성으로 값을 설정)
+		- .setAttribut("이름",값);
+		
+	- EL에서는 scope 객체를 지원하는 객체를 제공.
+	
+	pageContex : pageScope
+	request : requestScope
+	session : sessionScope
+	application : applicationScope
+	사용법)
+		1. scope 객체에 값을 할당.
+		<%
+		pageContext.setAttribute("이름",값);
+		%>
+		2. EL에서 scope 객체명.이름 으로 scope객체에 할당된 값을 사용
+		${ pageScope.이름 }
+	
+EL로 웹 파라미터 출력
+	- ${param.폼컨트롤명}	
+	- ${paramValues.폼컨트롤명}
+	
+JSTL (JSP Standard Tag Library)
+	- Java가 아닌 다른 개발자나 단체에서 만들고 배포하는 액션 태그
+	- 표준액션.(<jsp:태그명/>)에서 지원하지 않는 기능을 제작하여 제공하기위해서 만들어진 library
+		Tag's Library(TagLib's)
+	- 배포는 .jar로 되고 웹 어플리캐이션에서 사용하려면 WEB-INF/lib 폴더에 넣으면 된다.
+	- apache.org에서 배포.	
+	
+사용법)
+	1. 지시자 선언) 외부 tab library와 연결.
+	<%@ taglib prefix="접두어" uri="Tab Lib를 사용하기위해 제공하는 URL" %>
+	
+	2. Tag lib에서 제공하는 tag를 사용.
+	 <prefix:태그명 속성:"값" ...> 내용 </prefix:태그명>
+	 
+core
+	- 제공기능 : 변수 선언, 웹 브라우저 출력, 제어문 사용, import, redirect, exception
+	사용법)
+	1.지시자 선언
+	<%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core"%>	// jsp가 빠진 url을 사용하면 JSTL에서 EL을 사용할 수 없다.
+	2. tag library에서 제공하는 기능 사용.
+	<c:태그명 속성명="값" .../>
+	
+	- 변수)
+		선언 
+		<c:set var="변수명" value="값"(EL 사용 가능 ${ 이름 }) />
+		삭제
+		<c:remove var="변수명"/>
+		
+		웹브라우저로 출력
+		 - escapeXml="true|false" : 입력값에 HTML tag가 존재한다면 tag를 그대로 보여줄지 해석하여 그릴지를 설정가능
+		<c:out value="출력할 값" escapeXml="true|false"/> 
+	
+	- 제어문)
+		- scriptlet을 사용하지 않고 사용할 수 있다.
+		조건문 : if, choose(when, otherwise)
+		반복문 : forEach, forTokens
+		
+		if : 단일 if만 제공.
+		<c:if test="조건식">
+			조건에 맞을때 수행할 코드
+		</c:if>
+		
+		choose : 다중 if와 같다.
+		<c:choose>
+			<c:when test="조건식">
+				조건에 맞을때 수행할 코드
+			</c:when>
+			<c:when test="조건식">
+				조건에 맞을때 수행할 코드
+			</c:when>
+			<c:otherwise>
+				모든 조건에 맞지 않을때 코드
+			</c:otherwise>
+		</c:choose>
+	
+	- 반복문)
+		- forEach : 인덱스르 출력하거나, 배열, java.util.Collection을 반복하여 모든 방의 값을 출력할 때 사용.
+		
+		문법)
+			-인덱스만 출력.
+			<c:forEach var="변수명" begin="시작값" end="끝값" step="증가값">
+				반복수행될 코드
+				EL에서 var에 변수명을 사용하면 begin에서부터 end까지의 값을 출력할 수 있다.
+				시작값은 양수만 가능
+				증가값은 증가만 가능
+			</c:forEach>	
+		
+			-배열 출력
+				- 주의: 숫자를 출력하는 속성은 사용하지 않는다. (begin,end,step)
+			<c:forEach var="변수명" item="${ 배열명, collction명 }" varStatus="증가하는 값을 저장하는 객체">
+				${변수명}
+			</c:foreach>
+			
+			<%
+			1. 배열, collection생성, 얻기.
+			String[] arr = {"","","","",""};//서비스객체.method()
+			2. scope 객체에 저장
+			pageContext.setAttribute("이름", 배열명);
+			%>
+			3. 반복
+			<c:forEach var="변수명" items="${scope객체명}" varStatus="i">
+				${i.count} ${변수명}
+			</c:forEach>
+			
+여러 개의 값을 가진 객체 사용 (DTO 나 VO가 element로 구성.)
+	1. DTO를 사용한 배열이나 Collection을 생성
+		List<DTO> list = new ArrayList<DTO>();
+	2. scope 객체에 저장
+		pageContext.setAttribute("getList",list);
+	3. scope에 저장된 값 사용
+		<c:forEach var="변수명" items="${ getList }" varStatus="객체명">
+			${ 변수명.getter 이름 }		
+		</c:forEach>
 	
 	
+forTokens
+	- for문과 StringTokenizer가 결합된 태그
+	- CSV데이터를 자를때 사용. (모든 문자열을 자를수 있다.)
+	
+	<%
+	String csvData = "a,b,c,d";
+	pageContext.setAttribute("data", csvData); //scope에 데이터 설정
+	%>	
+	- 문자열 나누는 구분 문자는 or 기능이 존재한다.
+	- 구분 문자에 해당하는 모든 문자를 토큰으로 구분할 수 있다.
+	<c:forTokens var="변수명" items="${ 스콥객체명 }" delims="구분문자">	
+	${변수명} // token으로 구분된 하나의 데이터를 출력
+	</c:forTokens>	
+	
+
+import
+	- 여러개의 JSP를 한번에 사용하기 위해 사용.
+	- action tag<jsp:include>와 같은 역활.
+	- url을 지원 
+	- 페이지 지시자 충돌이 발생하지않고 변수난 메소드가 공유된다.
+	
+catch : 예외처리 시 사용.
+	- 단점 : 예외 발생시 자세한 내용이 나오지 않는다.
+	- scriptlet 과 expression 은 _jspService에 try ~ catch블럭에 만들어진다.
+		=> 개발자가 try catch를 하지 않아도 코드에서 에러가 발생하지 않는다.
+		=> 예외의 메세지가 그대로 사용자에게 전달된다.
+		=> 서버의 정보가 외부로 노출되는 문제 발생
+		
+	1. page derective => errorPage=""
+	2. DD(web.xml)에서 설정 => <error-page> 설정
+	3. try~catch 감싸기 => <c:catch>
+	
+	<c:catch var="예외처리객체를 저장할 변수명">
+		<%
+		예외 발생 예상 코드
+		%>
+	</c:catch>
+	
+	단점 : 에외코드 발생시 사용자에게 응답할 코드가 없다. => 아무것도 제공되지 않는다.
+	예외 발생시 예외처리객체를 저장할 변수명에 값이 할당된다.
+	<c:if test="${ 예외처리객체를 저장할 변수명 != null }">
+		예외 발생시 사용자에게 제공할 코드
+	</c:if>
+	
+	
+redirect : 페이지 이동 기술
+	- 접속자에게 페이지를 응답한 후 접속자의 웹브라우저가 자동으로 재 요청하는 방식.
+	- 웹 브라우저는 페이지의 이동을 알수 있다.
+	- response.sendRedirect ("이동할 URL")은 아랫줄의 코드가 모두 실행되므로 return과 함께 사용 한다.
+	- <c:redirect> 는 아랫줄의 코드가 실행되지 않고 이동한다.
+	<c:redirect url="이동할 url"/>
+	
+	
+fmt
+	- 날짜, 숫자형식을 변경할여 출력할 때 사용.
+	1. 지시자 선언
+	<%@ taglib prefix="fmt" uri="http://java.sun.com/jsp/jstl/fmt" %>
+	2. 숫자 변환 ; 숫자에 , . 을 넣을때.
+	<fmt:formatNumber value="출력할 숫자값" pattern="출력 형식"/> pattern 형식 : 0, #
+	3. 날짜 변환
+	<fmt:formatDate valeu="날짜객체" pattern="simpleDateFormat에 날짜 패턴"/>
+	
+	
+DBCP (Data Base Connection Pool)
+	- JDBC방식에서 Connection 관리 방법을 개선한 방식.
+		- DB연동이 필요한 작업이 있을때마다 Connection을 계속 연결하고, 끊는 방식.
+		- 커넥션의 재사용성이 떨어진다.
+		
+		- 장점 : 필요할때 마다 연결을 얻고, 해제하기 때문에 메모리를 절약할 수 있다.
+		
+		- 단점 : 초기 지연 시간이 발생한다.(DBMS를 찿고 연결을 얻는데 까지 들어가는 시간) 
+	
+	- 일정개수의 커넥션을 미리 연결해두고, 필요한 때 커넥셔능ㄹ꺼내서 사용하고, 다시 넣는 방식.
+		- 장점 : 초기지연시간이 줄어든다. 커넥션의 재사용성이 향상
+		- 단점 : 메모리의 낭비
+		
+	- tomcat은 설정을 통해서 DBCP를 사용할 수 있다.
+	- tomcat에서 제공하는 DBCP는 project마다 설정하고, 독립적으로 사용한다.
+	
+	1. DB vendor 사에서 제공하는 driver를 (*.jar 로 배포) CATALINA_HOME/lib에 설치 (ojdbc.jar)
+	2. DBCP가 필요한 <Context>안에 DBCP를 설정(<Resource>)
+		<Context> 속성
+		- docBace ="C:/dev/..." : HDD의 경로
+		- path="/jsp_prj" : web browser에서 사용할 이름
+		- reloadable="true" : 소스를 변경시 자동 반영되도록 하는 설정.
+		
+		<Resource> 속성
+		- name="jdbc/dbcp" : JNDI 사용객체에서 찿을 이름.중요
+		- auth="Container" 
+		- type="javax.sql.DataSource" : DBCP안에서 DBMS와 연결을 유지할 객체
+		- driverClassName=""
+		- url=""
+		- username="scott"
+		- password="tiger"
+		- maxTotal="20" : DBCP에서 DBMS와 연결을 유지할 DataSource가 모두 사용중일 때 
+							연결을 추가하여 유지할 총 DataSource의 개수. (10개 사용중 10개더 추가해준다. = 20)
+		- maxIdle="10" : DBCP에서 DBMS와 연결을 유지할 DataSource의 개수
+		- maxWaitMillis="-1" : DBCP 에서 DBMS와 연결을 유지한 DataSource를 얻어가는데 들어가는 지연시간.(-1:즉시)
+	
+	1. JNDI 사용 객체 생성.
+	Context ctx = new InitialContext();
+	2. 이름으로 객체 찿기
+	DataSource ds = (DataSource) ctx.lookup("이름");
+
+	
+	
+DBMS
+	- 조직에 중요한 정보자산이 저장
+	- DBMS에 저장되는 정보가 일반문자열(plain text) 인 경우 단순 조회로 모든 정보가 조회되고 확인가능.
+		=> 정보보호가 되지 않는다.
+	- 사이트의 관리자가 사용자의 정보를 손쉽게 확인이 가능해진다.
+	- DBMS가 탈취되면 모든 정보를 손쉽게 확인할 수 있다.
+	- 저장되는 정보의 중요도에 따라 암호화 수행
+		=> 정보 보호 작업을 수행.(일방향해시, 암호화) : 비용 발생	
+	- 아무도 확인하지 못하도록 만들때 => 일방향 Hash 저장
+		(비밀번호, 주민번호, cvc)
+	- 관리자의 등급에 따라 확인이 가능해야할 때. => 복호화가 가능한 암호화.(양방향 hash)
+		(전화번호, 이메일, 이름)
+	- 일반 문자열
+		(우편번호, 주소, ip, flag값)
+		
+암호화
+	- 정보보호를 위해서 한다.
+	- DBMS의 저장된 데이터를 보호하기위해서 수행 : 비용이 발생
+	- java.security 패키지에서 관련 클래스 제공.
+		(SHA(Secure Hash Algorithm : 일방향 Hash )와 양방향 암호화(복호화 가능)가 제공.)
+	- SHA(Secure Hash Algorithm : 일방향 Hash
+		=> 복호화가 가능하지 않은 유일한 문자열로 생성.(키 없다.)
+		=> 자바에서 지원하는 알고리즘은 MD2, MD5,SHA-1,...  있다
+		=> 알고리즘에 따라서 변환되는 Hash값의 길이가 다르다.
+	
+	- 양방향 암호화 (복호화 가능)
+		=> 암호화된 문자열을 키를 사용하여 원래의 문자열로 변환할 수 있는암호화
+		=> 양방향 암호화 DES, #DES, AES 등 존재
+		=> 키 존재 (대칭키, 비대칭키)
+		=> DES(Data Encryption Standard) : 대칭키 기반의 암호화 (1970년에 개발된 잘 만들어진 암호화 알고리즘 )
+		
+SHA 사용법
+	1. 알고리즘을 설정하여 객체 얻기
+	 MessageDigest md = MessageDigest.getInstance("알고리즘 종류");
+	2. 평문에 알고리즘 적용.
+	 md.update(평문문자열.getBytes()); //byte[]로 리턴 : 설정한 알고리즘 대로 일방향 Hash가설정. - 사람이 알아볼수 없다.
+	3. 알고리즘을 적용받은 byte[] 받는다.
+	 String str = new String(md.digest());
+	4. 사람이 알아볼 수 있는 문자열로 생성.
+	 java.util.Base64 encoder를 사용. [이미지 올리떄?]
+	 String str = new String(Base64.getEncoder().encode(md.digest()));
+	 
+	 
+java 에서 제공하는 algorithm
+	 MD2, MD5,SHA-1 여기까지는 취약함
+	 SHA-224, SHA-256, SHA-384, SHA-512... : 아직까지는 보안상 좋다.
+
+	- MD5 (Message Digest Algorithm 5)
+		- 데이터를 128bit인 고정길이 Hash값으로 변환하는 함수.
+		- file의 무결성 검증, 비밀번호 처리, 디지털 서명, 인증서 생성에 주로 사용했었다.
+		- SHA-256이상이 권장되 사항이다.	
+		
+	- SHA-1 (Secure Hash Algorithm 1)
+		- 데이터를 160bit인 고정길이 Hash값으로 변환하는 함수.
+		- file의 무결성 검증, 비밀번호 처리, 디지털 서명, 인증서 생성에 주로 사용했었다.
+		- SHA-256이상이 권장되 사항이다.
+	
+	- SHA-2x (Secure Hash Algorithm 2)
+		- 데이터를 256bit 이상인 고정길이 Hash값으로 변환하는 함수.
+		- 현재까지는 안전하고 신뢰할 수 있는 알고리즘.
+		- file의 무결성 검증, 비밀번호 처리, 디지털 서명, 인증서 생성에 주로 사용했었다.
+			=> HTTPS, 블록체인, JWT토큰 등에서 사용.
+	
+웹 동작 방식
+	- 동기식, 비동기식.
+	
+동기식
+	- 서버로 요청을 보내면 웹 브라우저는 응답받은 HTML을 그리기위해 웹브라우저안의 모든내용을 삭제한 후,
+		서버에서 응받이 올 때까지 기다린 다음, 응답이 오면 응답받은 내용을 그리는 방식
+		=> 화면 깜빡임이 발생 (현재 화면 > 빈화면 > 새로운 화면 그리기)
+		=> 화면의 일부분만 변경되더라도 모든 데이터를 다시 받아와서 다시 그린다. (네트워크 코스트의 증가.)
+	- <a>, <form>로 요청을 보낼 때 동기식으로 동작.
+	- 전체화면을 다시 그려야 할 때 사용.
+	- 단점 : 화면 일부분만 변경되더라도 변경되지 않은 데이터까지 모두 새로 받아와서 다시 그린다.
+			network cost 의 증가.
+	
+suggest를 동기 방식으로 제작하지 않는다.
+
+
+비 동기방식(Async)
+	- 데이터만 보내고, 데이터만 받는 방식.
+	- RIA (Rich Internet Application)
+		=> 접속자 웹 브라우저의 자원을 더 많이 사용하는 web Application
+AJAX
+	- XML,Http,Request가 핵심 객체
+	- 서버에서 동기방식과 다르게 HTML의 일부분, TEXT, XML, JSON이 응답된다.
+	- 화면 깜빡임이 발생하지 않는다.
+	
+데이터 생성 ( HTML, TEXT, XML, JSON)
+	- JSP에서 JSONObject이나 JSONArray를 만들어서 응답.
+		- 외부 라이브러리를 사용하지 않고 JSON 데이터 생성(권장하지 않는다.)
+		<%
+		%>
+		<%= %>
+		- 외부 라이브러리를 사용하고 JSON 데이터 생성
+			- google에서 배포하는 JSON-simple library를 사용.
+			- java.util,Map 과 java.util.List를 기반으로 제작된 Library
+			
+	JSONObject생성 사용법
+		1. 객체 생성 - generic을 지원하지 않는다.
+		JSONObject jsonObj = new JSONObject(); // map기반에 클래스 
+		2. 값 할당 - 입력한 순서대로 들어가지 않는다.(같은 이름이 입력되면 덮어씌운다.)
+		jsonObj.put("이름",값);
+		3. JSONObject이 가진 값을 문자열로 얻기
+		String jsonStr = jsonObj.toJSONtring();
+
+	사용법
+		JSONObject jsonObj = new JSONObject();
+		jsonObj.put("name","홍길동");
+		jsonObj.put("age", 2);
+		
+		String str = jsonObj.toJSONString();
+		
+	JSONArray의 사용법
+		1. 객체 생성 - generic을 지원하지 않는다.
+		JSONArray jsonArr = new JSONArray();//List 기반에 클래스
+		2. 값 할당 - 입력한 값은 순서대로 들어간다.(중복값을 가진다.)
+		2-1. JSONObject 생성
+		JSONObject jsonObj = new JSONObject();
+		2-2. JSONObject에 값 할당
+		jsonObj.put("이름", 값);
+		2-3 JSONArray에 JSONObject 할당
+		jsonArr.add(jsonObj);
+	
+	사용법
+		JSONArray jsonArr = new JSONArray();
+		
+		JSONObject jsonObj = new JSONObject();
+		jsonObj.put("name","테스트");
+		jsonObj.put("age",20);
+		JSONObject jsonObj2 = new JSONObject();
+		jsonObj2.put("name","테스트2");
+		jsonObj2.put("age",30);
+		
+		jsonArr.add(jsonObj);
+		jsonArr.add(jsonObj2);
+		
+	복합형태
+		- JSONObject 안에 JSONArray가 있는 형태	
+		
+jQuery AJAX 함수
+	- jQuery에서는 $.ajax()를 사용하여 AJAX를 손쉽게 사용할 수 있다.
+	- AJAX함수는 jQueryObject에서 바로 제공하는 함수 (selector를 사용하여 대상을 찿지 않는다.)
+	- $.ajax()안에서 요청과 응답을 모두 처리한다.
+	
+	- 비 동기식 : 서버에서 응답을 모두 처리하기 전에 callback function이 호출 되는 방식 
+		- 응답되는 데이터의 양이 많거나, 처리속도가 느리다면, 처리완료전 callback function이 호출될 수 있다.
+	- 동기식 : 서버에서 업무처리가 모두 완료된 후 callback function이 호출 되는방식
+		- 응답되는 데이터의 양이 많더라도 처리가 완료된 후 callbck function이 호출 되므로 데이터를 모두 제공할 수 있다.	
+	
+	- callback function : 개발자가 호출하는 것이 아닌 응답 상황에 따라 자동으로 호출되는 함수.
+	사용법0
+	$.ajax({
+	////요청에 대한 설정////////////////////////////////////////////////////////////////////////
+	
+		url : "요청할 JSP URL",
+		type:"요청방식 GET || POST",
+		data:"서버로 전송할 값 - web parameter  queryString",
+		async:"동작방식 true || false",  // 비 동기식(true 기본)||동기식(false)
+	
+	////응답에 대한 설정////////////////////////////////////////////////////////////////////////
+	
+		dataType:"서버에서 응답되는 데이터형식의 지정 HTML,TEXT,XML,JSON",
+		error: function(xhr){
+			에러가 발생했을 때 실행 될 코드 정의
+		},
+		success: function(data){
+			응답 성공했을 때 실행될 코드를 정의.
+			(응답받은 데이터를 사요하여 view를 만들고 DOM으로 보여줄 곳을 찿아서 응답화면을 동적으로 생성한다.)
+			(응답 데이터를 받아서 화면 일부분ㅇ르 생성하고 지정한 영역에 디자인을 변경)
+		}
+	
+	});		
+		
+	web parameter 전송
+		- QueryString 방식, JSONObject 방식 두가지를 사용할 수 있다.
+		- 개발자가 web parameter명과 값을 만들어서 전송하기 때문에 <form 태그가 필요없다.>
+		
+	QueryString
+		- var param ="이름"+변수명+"&이름="+변수명;
+		
+	$.ajax({
+		url:"요청할jsp",
+		data:param
+	});	
+		
+	JSONObject
+		var param ={이름:값, 이름:값,,,};	
+		
+	JSONObject Parsing
+		- 데이터에서 원하는 부분을 잘라내어 사용하는 것.
+		JSONObject객체명.이름
+		
+	JSONArray의 parsing	
+		- 반복문을 사용하여 모든값을 parsing한다.
+		$.each(JSONObject객체명.이름, function(인덱스 변수, 방의 값){
+			// JSONObject parsing
+			방의값.이름
+		});
+		
+		
+List 만들기 - 많은 양의 레코드를 분할하여 보여주기기위해서.
+
+1. 총 레코드의수 구하기
+	int totalCnt = rs.getInt("cnt");
+2. 한 화면에 보여줄 게시물의 수
+	int pageScale = 7;//한 페이지에서 보여질 건수
+3. 총 페이지 수
+	int totalPage = 0;// 총건에 대비 스케일에 따라 페이지 수가 증가 또는 감소한다.
+	
+	int remain = totalCnt%pageScale;
+	
+	if(remain != 0){// 
+		totalPage = totalCnt/PageScale + 1;
+	} else {
+		totalPage = totalCnt/pageScale;
+	}
+	
+	// wrapclass에 있는 Math.ceil을 사용하여 초기화 하면서 총 페이지 값을 얻는다. 
+	int totalPage = (int) Math.ceil((double)totalCnt/pageScale);
+		
+4. 시작 번호 구하기
+	[1][2][3].... => <a href="boardList.jsp?currentPage=1">[1]</a>...
+	
+	String tempPage = request.getParameter("currentPage");
+	int currentPage = 1;
+	if(tempPage != null){
+		currentPage = integer.parseInt(tempPage);
+	}
+	int startNum = 1; // pagination을 클릭하면 해당페이지의 번호로 설정.
+	// 1페이지 = 1, 2페이지 = 8, 3페이지 = 14,....
+	startNum = currentPage * pageScale - pageScale + 1; 	
+		
+5. 끝 번호를 구하기
+	int endNum = startNum+pageScale+1;		
+	
+6. 시작 번호와 끝 번호 사이에 해당하는 게시물을 검색
+
 	
 	
 	

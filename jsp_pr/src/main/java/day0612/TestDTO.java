@@ -11,7 +11,6 @@ import lombok.ToString;
 @Getter
 @Setter
 @ToString
-
 public class TestDTO {
 	private String name;
 	private int age;

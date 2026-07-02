@@ -2,54 +2,67 @@
     pageEncoding="UTF-8"%>
 <!DOCTYPE html>
 <html>
+
 <head>
-<meta charset="UTF-8">
-<title>JSPTemplate</title>
-<link rel="shortcut icon" href="http://192.168.10.79/jsp_prj/common/images/favicon.ico"/>
+	<meta charset="UTF-8">
+	<title>Insert title here</title>
 
-<!-- bootstrap CDN -->
-<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-sRIl4kxILFvY47J16cr9ZwB07vP4J8+LH7qKQnuqkuIAvNWLzeN8tE5YBujZqJLB" crossorigin="anonymous">
-<script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.11.8/dist/umd/popper.min.js" integrity="sha384-I7E8VVD/ismYTF4hNIPjVp/Zjvgyol6VFvRkX/vR+Vc4jQkC+hVqc2pM8ODewa9r" crossorigin="anonymous"></script>
-<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/js/bootstrap.min.js" integrity="sha384-G/EV+4j2dNv+tEPo3++6LCgdCROaejBqfUeNjuKAiuXbjrxilcCdDz6ZAVfHWe1Y" crossorigin="anonymous"></script>
+	<link rel="shortcut icon" href="http://192.168.10.80/jsp_prj/common/images/favicon.ico">
 
-<!-- jQuery google API -->
-<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.7.1/jquery.min.js"></script>
+	<!-- Bootstrap CDN -->
+	<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/css/bootstrap.min.css" rel="stylesheet"
+		integrity="sha384-sRIl4kxILFvY47J16cr9ZwB07vP4J8+LH7qKQnuqkuIAvNWLzeN8tE5YBujZqJLB" crossorigin="anonymous">
+	<script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.11.8/dist/umd/popper.min.js"
+		integrity="sha384-I7E8VVD/ismYTF4hNIPjVp/Zjvgyol6VFvRkX/vR+Vc4jQkC+hVqc2pM8ODewa9r"
+		crossorigin="anonymous"></script>
+	<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/js/bootstrap.min.js"
+		integrity="sha384-G/EV+4j2dNv+tEPo3++6LCgdCROaejBqfUeNjuKAiuXbjrxilcCdDz6ZAVfHWe1Y"
+		crossorigin="anonymous"></script>
 
 	<style type="text/css">
-		#wrap { width: 1000px; height: 900px; margin: 0px auto; }
-		/* header : 사이트 로고, navigation bar */
-		#header { height: 200px; } 
-		/* 사용자에게 제공할 서비스 */
-		#container { height: 600px; }
-		/* 기업정보, 고객사 정보, 개인정보 보호 정책 */ 
-		#footer { height: 100px; }
+		#wrap {
+			width: 1000px;
+			height: 900px;
+			margin: 0px auto;
+		}
+
+		#header {
+			height: 200px;
+		}
+
+		#container {
+			min-height: 600px;
+		}
+
+		#footer {
+			height: 100px;
+		}
 	</style>
+
+	<!-- jQuery CDN -->
+	<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.7.1/jquery.min.js"></script>
+
 	<script type="text/javascript">
-	//jQuery
-	$(function(){
-		alert("document 레디");
-	});//ready
-	
+		$(function () {
+			
+		}); // ready
 	</script>
 </head>
+
 <body>
 	<div id="wrap">
-		<div id="header">
-			
-		</div>
+		<div id="header"></div>
 		<div id="container">
 			<%
-			String msg="오늘은 월요일 입니다.";
-			//msg+="<br>내일은 화요일 입니다."; //Java 주석 : Java Source Code로 생성 =>compile 되지 않는다.
+			String msg = "오늘은 월요일 입니다.";
+			/* msg += "<br> 내일은 화요일 입니다."; // java 주석 : java source code로 생성 -> compile 되지 않는다.*/
 			%>
 			<span><%= msg %></span><br>
-			<span>JSP 주석 <%-- <%= msg %> --%> </span><br>
-			<span>HTML 주석 <!-- <%= msg %> --></span><br>
-			
+			<span>JSP주석 <%-- <%= /* msg */ %> --%></span><br>
+			<span>HTML주석 <!-- <%= msg %> --></span><br>
 		</div>
-		<div id="footer">
-		
-		</div>
+		<div id="footer"></div>
 	</div>
 </body>
+
 </html>
