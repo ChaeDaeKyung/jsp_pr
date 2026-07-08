@@ -272,8 +272,12 @@
 			
 			
 			String sessionFlag = (String) session.getAttribute("sessionFlag");
+			String[] numArr = null;
 			
-			String[] numArr = sessionFlag.split(",");
+			if(sessionFlag != null){
+				numArr = sessionFlag.split(",");
+			}
+			
 			boolean flag = false;
 			if(numArr != null){
 				for(int i = 0; i< numArr.length; i++){
@@ -328,7 +332,13 @@
 								<input type="button" id="btnUpdate" name="btnUpdate" class="btn btn-primary btn-sm" value="글수정"/>
 								<input type="button" id="btnDelete" name="btnDelete" class="btn btn-warning btn-sm" value="글삭제"/>
 							</c:if>
-							<a href="javascript:location.href='boardList.jsp?currentPage=${ param.currentPage }'" class="btn btn-info btn-sm">리스트</a>
+							<c:set var="queryString" value="currentPage=${ param.currentPage }"/>
+							<c:if test="${ not empty param.keyword }">
+							<a href="javascript:location.href='boardList.jsp?${ queryString }&fieldNum=${ param.fieldNum }&keyword=${ param.keyword }'" class="btn btn-info btn-sm">리스트</a>
+							</c:if>
+							<c:if test="${ empty param.keyword }">
+							<a href="javascript:location.href='boardList.jsp?currentPage=${ param.currentPage }&fieldNum=${ param.fieldNum }'" class="btn btn-info btn-sm">리스트</a>
+							</c:if>
 						</td>
 					</tr>
 				</table>

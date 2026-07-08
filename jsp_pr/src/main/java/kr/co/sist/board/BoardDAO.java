@@ -27,7 +27,7 @@ public class BoardDAO {
 		return bDAO;
 	}
 
-	public int selectTotalCount() throws SQLException {
+	public int selectTotalCount(RangeDTO rDTO) throws SQLException {
 		int totalCount = 0;
 
 		Connection con = null;
@@ -39,12 +39,21 @@ public class BoardDAO {
 		try {
 			con = gc.getConn("dbcp");
 
-			StringBuilder sql = new StringBuilder();
-			sql //
-					.append("	select count(*) cnt	") //
-					.append("	from board	"); //
-
-			pstmt = con.prepareStatement(sql.toString());
+			StringBuilder selectSql = new StringBuilder();
+			selectSql //
+					.append("	select count(*) cnt	")
+					.append("	from board			");
+			if(rDTO.getKeyword()!= null && !rDTO.getKeyword().isEmpty()) {
+				//검색 키워드가 있을 때 쿼리문이 변경d(ynamic Query에 생성기준)
+				//selectSql.append("	where ").append(rDTO.getKeyword()).append(" like '%'||?||'%'");
+				selectSql.append("	where instr('").append(rDTO.getKeyword()).append("', ?) != 0");
+			}
+			
+			pstmt = con.prepareStatement(selectSql.toString());
+			if(rDTO.getKeyword()!= null && !rDTO.getKeyword().isEmpty()) {
+				pstmt.setString(1,rDTO.getKeyword());
+				
+			}
 
 			rs = pstmt.executeQuery();
 
@@ -81,15 +90,28 @@ public class BoardDAO {
 					 * .append("	where rn between ? and ?	");
 					 */
 			
-			.append("	select num, id, title, input_date, cnt		")
-			.append("	from (select NUM, ID, TITLE, INPUT_DATE, CNT, row_number() over(order by input_date desc ) rnum		")
-			.append("		from board) 		")
-			.append("	where rnum between ? and ?		");
+			.append("	select num, id, title, input_date, cnt, upfile		")
+			.append("	from (select NUM, ID, TITLE, INPUT_DATE, CNT,upfile, row_number() over(order by input_date desc ) rnum		")
+			.append("		from board 		");
+			
+			if(rDTO.getKeyword()!= null && !rDTO.getKeyword().isEmpty()) {
+				selectBoard
+					.append("	where instr(		")
+					.append(rDTO.getField())
+					.append(", ?) != 0		");
+				
+			}
+			
+			selectBoard.append("	) where rnum between ? and ?		");
 			
 			pstmt = con.prepareStatement(selectBoard.toString());
-			
-			pstmt.setInt(1, rDTO.getStartNum());
-			pstmt.setInt(2, rDTO.getEndNum());
+			//System.out.println(selectBoard);
+			int bindInd = 0;
+			if(rDTO.getKeyword()!= null && !rDTO.getKeyword().isEmpty()) {
+				pstmt.setString(++bindInd, rDTO.getKeyword());
+			} 
+			pstmt.setInt(++bindInd, rDTO.getStartNum());
+			pstmt.setInt(++bindInd, rDTO.getEndNum());
 			
 			rs = pstmt.executeQuery();
 			
@@ -102,6 +124,7 @@ public class BoardDAO {
 				bDTO.setTitle(rs.getString("title"));
 				bDTO.setInputDate(rs.getDate("input_date"));
 				bDTO.setCnt(rs.getInt("cnt"));
+				bDTO.setUpfile(rs.getString("upfile"));
 				boardList.add(bDTO);
 			}// end while
 			
@@ -123,17 +146,34 @@ public class BoardDAO {
 			con = gc.getConn("dbcp");
 			
 			StringBuilder insertBoard = new StringBuilder();
-			
+			boolean flag = bDTO.getUpfile() != null;
 			insertBoard //
-			.append("	insert into board( num, id, title, content, ip )		")
-			.append("	values	( seq_board.nextval,?,?,?,?)		");
+			.append("	insert into board( num, id, title, content, ip");
+			if(flag) {
+				insertBoard
+				.append("	, upfile		");
+			}
+			insertBoard
+			.append("	)		");
 			
+			insertBoard
+			.append("	values	( seq_board.nextval,?,?,?,?");
+			if(flag) {
+				insertBoard
+				.append(",?");
+			}
+			insertBoard
+			.append(")");
 			pstmt = con.prepareStatement(insertBoard.toString());
 			
 			pstmt.setString(1, bDTO.getId());
 			pstmt.setString(2, bDTO.getTitle());
 			pstmt.setString(3, bDTO.getContent());
 			pstmt.setString(4, bDTO.getIp());
+			
+			if(flag) {
+				pstmt.setString(5, bDTO.getUpfile());
+			}
 			
 			pstmt.executeUpdate();
 

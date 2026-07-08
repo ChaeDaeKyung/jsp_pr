@@ -1,14 +1,6 @@
 <%@ page language="java" contentType="text/html; charset=UTF-8"
 	pageEncoding="UTF-8" %>
 <%@ include file="../include/siteProperty.jsp" %>
-<%-- <%@ include file="../include/loginCheck.jsp" %> --%>
-<% 
-String sessionId="test3"; 
-String sessionName="테스트";
-
-pageContext.setAttribute("userId", sessionId);
-pageContext.setAttribute("userName", sessionName);
-%>
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
 
 <!DOCTYPE html>
@@ -26,8 +18,6 @@ pageContext.setAttribute("userName", sessionName);
 <%-- <jsp:include page="../fragments/external_file.jsp"/> --%>
 <c:import url="${ CommonURL }/fragments/external_file.jsp"/>
 <%-- <%@ include file="../include/external_file.jsp" %> --%>
-
-
 <style>
 .bd-placeholder-img {
 	font-size: 1.125rem;
@@ -114,46 +104,14 @@ pageContext.setAttribute("userName", sessionName);
 
 <!-- jQuery google API -->
 <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.7.1/jquery.min.js"></script>
-<!-- include summernote css/js-->
-<link href="https://cdn.jsdelivr.net/npm/summernote@0.9.0/dist/summernote-lite.min.css" rel="stylesheet">
-<script src="https://cdn.jsdelivr.net/npm/summernote@0.9.0/dist/summernote-lite.min.js"></script>
-	<style type="text/css">
-		#wrap { width: 1000px; height: 900px; margin: 0px auto; }
-		/* header : 사이트 로고, navigation bar */
-		#header { height: 200px; } 
-		/* 사용자에게 제공할 서비스 */
-		#container { height: 600px; }
-		/* 기업정보, 고객사 정보, 개인정보 보호 정책 */ 
-		#footer { height: 100px; }
-	</style>
-	<script type="text/javascript">
+<script type="text/javascript">
 	//jQuery
 	$(function(){
-      $("#content").summernote({
-        placeholder: '자유롭게 글을 입력해주세요.',
-        tabsize: 2,
-        height: 500,
-        width: 600,
-		toolbar: [
-    	// [groupName, [list of button]]
-		['fontsize', ['fontsize']],
-		['color', ['color']],
-		['insert', ['picture']],
-		['height', ['height']]]
-      });
-
-      $("#btnWrite").click(chkNull);
-      
+		
 	});//ready
-	function chkNull(){
-		//alert($("#content").val() == "<p></p>");
-		if($("#title").val().trim() == ""){
-			alert("제목은 필수 입력입니다.");
-			return;
-		}// end if
-		$("#writeForm").submit();
-	}// chkNull
-</script>
+	
+	</script>
+
 </head>
 <body>
 	<svg xmlns="http://www.w3.org/2000/svg" class="d-none"> <symbol
@@ -220,46 +178,14 @@ pageContext.setAttribute("userName", sessionName);
 		</nav>
 	</header>
 	<main>
-		<div id="divWriteForm" style="margin-top: 20px;">
-			<form action="boardWriteFormProcess.jsp" method="post" name="writeForm" id="writeForm" enctype="multipart/form-data">
-				<table>
-					<tr>
-						<th colspan="2" style="text-align: center">
-						<h3>아무말 대잔치 글쓰기</h3>
-						</th>
-					</tr>
-					<tr>
-						<td>제목</td>
-						<td>
-							<input type="text" name="title" id="title" style="width:400px;">
-						</td>
-					</tr>
-					<tr>
-						<td>내용</td>
-						<td><textarea name="content" id="content" style="width: 400px; height: 300px;"></textarea>
-					</tr>
-					<tr>
-						<td>작성자</td>
-						<td><c:out value="${ userId }(${ userName }님)"/></td>
-					</tr>
-					<tr>
-						<td>첨부파일</td>
-						<td><input type="file" name="upfile" id="upfile"/></td>
-					</tr>
-					<tr>
-						<td>IP</td>
-						<td><%= request.getRemoteAddr() %></td>
-					</tr>
-					<tr>
-						<td colspan="2" align="center">
-							<input type="button" id="btnWrite" name="btnWrite" class="btn btn-success btn-sm" value="글작성"/>
-							<a href="javascript:history.back()" class="btn btn-info btn-sm">리스트</a>
-						</td>
-					</tr>
-				</table>
-			</form>
+		<div style="margin-top:50px;">
+		<form action="uploadProcess.jsp" method="post" enctype="multipart/form-data" name="frm" id="frm">
+		<label>업로더</label>
+		<input type="text" name="uploader" id="uploader"/><br>
+		<input type="file" name="upfile" id="upfile"/>
+		<input type="submit" value="업로드"/>
+		</form>
 		</div>
-		
 		<!-- /.container -->
 		<!-- FOOTER -->
 		<footer class="container">

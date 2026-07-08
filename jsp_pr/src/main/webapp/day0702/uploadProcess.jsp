@@ -1,16 +1,18 @@
+<%@page import="java.util.UUID"%>
+<%@page import="java.io.IOException"%>
+<%@page import="com.oreilly.servlet.multipart.DefaultFileRenamePolicy"%>
+<%@page import="java.io.File"%>
+<%@page import="com.oreilly.servlet.MultipartRequest"%>
 <%@ page language="java" contentType="text/html; charset=UTF-8"
 	pageEncoding="UTF-8" %>
 <%@ include file="../include/siteProperty.jsp" %>
-<%-- <%@ include file="../include/loginCheck.jsp" %> --%>
-<% 
-String sessionId="test3"; 
-String sessionName="테스트";
-
-pageContext.setAttribute("userId", sessionId);
-pageContext.setAttribute("userName", sessionName);
-%>
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
-
+<%
+if(!"POST".equals(request.getMethod())){
+	response.sendRedirect("uploadForm.jsp");
+	return;
+}
+%>
 <!DOCTYPE html>
 <html lang="en" data-bs-theme="auto">
 <head>
@@ -26,8 +28,6 @@ pageContext.setAttribute("userName", sessionName);
 <%-- <jsp:include page="../fragments/external_file.jsp"/> --%>
 <c:import url="${ CommonURL }/fragments/external_file.jsp"/>
 <%-- <%@ include file="../include/external_file.jsp" %> --%>
-
-
 <style>
 .bd-placeholder-img {
 	font-size: 1.125rem;
@@ -114,46 +114,14 @@ pageContext.setAttribute("userName", sessionName);
 
 <!-- jQuery google API -->
 <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.7.1/jquery.min.js"></script>
-<!-- include summernote css/js-->
-<link href="https://cdn.jsdelivr.net/npm/summernote@0.9.0/dist/summernote-lite.min.css" rel="stylesheet">
-<script src="https://cdn.jsdelivr.net/npm/summernote@0.9.0/dist/summernote-lite.min.js"></script>
-	<style type="text/css">
-		#wrap { width: 1000px; height: 900px; margin: 0px auto; }
-		/* header : 사이트 로고, navigation bar */
-		#header { height: 200px; } 
-		/* 사용자에게 제공할 서비스 */
-		#container { height: 600px; }
-		/* 기업정보, 고객사 정보, 개인정보 보호 정책 */ 
-		#footer { height: 100px; }
-	</style>
-	<script type="text/javascript">
+<script type="text/javascript">
 	//jQuery
 	$(function(){
-      $("#content").summernote({
-        placeholder: '자유롭게 글을 입력해주세요.',
-        tabsize: 2,
-        height: 500,
-        width: 600,
-		toolbar: [
-    	// [groupName, [list of button]]
-		['fontsize', ['fontsize']],
-		['color', ['color']],
-		['insert', ['picture']],
-		['height', ['height']]]
-      });
-
-      $("#btnWrite").click(chkNull);
-      
+		
 	});//ready
-	function chkNull(){
-		//alert($("#content").val() == "<p></p>");
-		if($("#title").val().trim() == ""){
-			alert("제목은 필수 입력입니다.");
-			return;
-		}// end if
-		$("#writeForm").submit();
-	}// chkNull
-</script>
+	
+	</script>
+
 </head>
 <body>
 	<svg xmlns="http://www.w3.org/2000/svg" class="d-none"> <symbol
@@ -220,46 +188,52 @@ pageContext.setAttribute("userName", sessionName);
 		</nav>
 	</header>
 	<main>
-		<div id="divWriteForm" style="margin-top: 20px;">
-			<form action="boardWriteFormProcess.jsp" method="post" name="writeForm" id="writeForm" enctype="multipart/form-data">
-				<table>
-					<tr>
-						<th colspan="2" style="text-align: center">
-						<h3>아무말 대잔치 글쓰기</h3>
-						</th>
-					</tr>
-					<tr>
-						<td>제목</td>
-						<td>
-							<input type="text" name="title" id="title" style="width:400px;">
-						</td>
-					</tr>
-					<tr>
-						<td>내용</td>
-						<td><textarea name="content" id="content" style="width: 400px; height: 300px;"></textarea>
-					</tr>
-					<tr>
-						<td>작성자</td>
-						<td><c:out value="${ userId }(${ userName }님)"/></td>
-					</tr>
-					<tr>
-						<td>첨부파일</td>
-						<td><input type="file" name="upfile" id="upfile"/></td>
-					</tr>
-					<tr>
-						<td>IP</td>
-						<td><%= request.getRemoteAddr() %></td>
-					</tr>
-					<tr>
-						<td colspan="2" align="center">
-							<input type="button" id="btnWrite" name="btnWrite" class="btn btn-success btn-sm" value="글작성"/>
-							<a href="javascript:history.back()" class="btn btn-info btn-sm">리스트</a>
-						</td>
-					</tr>
-				</table>
-			</form>
-		</div>
+		<div style="margin-top: 50px">
+		<%
+		// 파일을 저장할 디렉토리 설정
+		File saveDir = new File("C:/Users/user/git/jsp_pr/jsp_pr/src/main/webapp/upload");
+		// 업로드 파일의 최대 크기 설정. 10Mb
+		//int maxSize = 1024*1024*10;
 		
+		//업로드 파일의 허용 크기를 크게 설정
+		int uploadMaxSize = 1024*1024*1000;
+		//업로드 가능한 파일의 최대 크기
+		int maxSize = 1024*1024*10;
+				
+		try{
+			MultipartRequest mr = new MultipartRequest(request, saveDir.getAbsolutePath(), uploadMaxSize,"UTF-8",new DefaultFileRenamePolicy());
+			
+			//10Mb를 초과한 파일이 업로드 된다.
+			String fileName=mr.getFilesystemName("upfile");
+			File uploadFile = new File(saveDir.getAbsoluteFile()+File.separator+fileName);
+			
+			boolean uplaodFlag = false;
+			if(uplaodFlag = (uploadFile.length() >= maxSize)){//업로드된 파일의 크기가 제한한 크기보다 크다면 삭제
+				uploadFile.delete();
+			}
+			if(uplaodFlag || !mr.getContentType("upfile").contains("image/")){
+				out.println("업로드된 파일 크기가 10Mbyte를 초과하여 업로드가 실패했습니다. 또는 이미지만 업로드 가능합니다.");
+			} else {
+				//이미지가 업로드 되었을때 알아볼수 없는 이름으로 저장한다.
+				String upfileName = uploadFile.getName();
+				String ext = fileName.substring(fileName.lastIndexOf("."));
+				File reNameFile = new File(uploadFile.getParent()+File.separator+UUID.randomUUID().toString().replaceAll("-", "")+ext);
+				uploadFile.renameTo(reNameFile);
+		%>
+		<hr>
+		MultipartRequest 사용<br>
+		업로더 : <%= mr.getParameter("uploader") %><br>
+		파일명 : <%= mr.getParameter("upfile") %><br>
+		원본파일명 : <%= mr.getOriginalFileName("upfile") %><br>
+		같은 이름이있을때 파일명 : <%= mr.getFilesystemName("uploader") %><br>
+		<% 
+			}//end else if
+		}catch(IOException ioe){
+			
+			ioe.printStackTrace();
+		}
+		%>
+		</div>
 		<!-- /.container -->
 		<!-- FOOTER -->
 		<footer class="container">
