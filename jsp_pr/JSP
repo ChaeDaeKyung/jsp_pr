@@ -1054,9 +1054,29 @@ UUID (Universally Unique Identifier)
 		UUID.randomUUID().toString();	
 	
 	
+XML (eXtensible Markup Language) : 확장 가능한 마크업 언어
+	- 프로그램의 환경 설정용.
+	- 대표적으로 web.xml, server.xml 을 설정한다.
+	- 이종 언어간의 데이터 전달용. => java -> javascript 데이터 전달, java -> python간에 데이터 전달시 사용.
+	- HTML (DTD 가 존재) 과 다르게 태그가 정해져 있지 않다.
+	- 개발자가 상황에 맞게 태그를 정의해서 사용한다.
+	- SGML에서 만들어지고, node(태그)를 개발자가 마음대로 선언할 수 있다.
+	- 연산의 기능이 없다.
+	- 작성 규칙을 지키지 않으면 error가 발생한다.
+	- XML, DTD, XSLT(XSL)로 구성될 수 있다.
+	- Well-formed 문서(저격문서) : XML만 존재하며, 작성규치만 준수하여 만드는 XML
+	- valid 문서 (유효문서) : XML과 작성규칙을 정의한 DTD(XML Schema)가 함께 사용되어 만드는 XML
+	- XSLT은 XML용 style sheet : XML을 HTML처럼 보이게 할 수 있다. 
 	
+	<?xml version="1.0 encoding="UTF-8"?>
+	<root>
+		<name>테스트</name>
+	</root>	
+	- java언어에서 발생한 데이터(테스트)를 js에서 사용할 수 있도록XML로 말아서 던진다.	
 	
-	
+XML 작성 규칙
+	- 대,소문자 구분
+	- 시작 node와 끝 node는 반드시 짝으로 나와야한다.(<시작></끝>)
 	
 	
 	
