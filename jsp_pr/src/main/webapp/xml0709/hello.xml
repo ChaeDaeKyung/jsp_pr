@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8"?><!-- XML선언부는 공백없이 첫줄에서만 작성이 가능한다. -->
+<messages><!-- 최상위 부모 노드는 하나만 존재한다. -->
+	<!-- 자식 노드들 -->
+	<message>안녕하세요</message>
+	<message>안녕히가세요</message>
+	<message>비가 온다.</message>
+	<message type="a" country="b">비가 온다.</message><!-- 속성간의 공백으로 구분되어 존재해야 한다. -->
+	<!-- <message>비가 온다.</messagE> 대,소문자를 구분한다. -->
+	<!-- <message> 끝 태그가 없으면 error가 발생한다. 시작 태그와 닫힘 태그는 반드시 짝으로 존재해야한다. -->
+</messages>

@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<depts>
+	<dept>
+		<deptNo>10</deptNo>
+		<dName>ACOUNTING</dName>
+		<loc>NEW YORK</loc>
+	</dept>
+	<dept>
+		<deptNo>20</deptNo>
+		<dName>ACOUNTING2</dName>
+		<loc>NEW YORK2</loc>
+	</dept>
+	<dept>
+		<deptNo>30</deptNo>
+		<dName>ACOUNTING3</dName>
+		<loc>NEW YORK3</loc>
+	</dept>
+</depts>
